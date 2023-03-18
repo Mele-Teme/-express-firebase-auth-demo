@@ -1,0 +1,1 @@
+{"version":3,"file":"graphQLConfig.js","sourceRoot":"","sources":["../../src/config/graphQLConfig.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,aAAa,EAAE,MAAM,iBAAiB,CAAC;AAEhD,MAAM,CAAC,MAAM,aAAa,GAAG,IAAI,aAAa,CAC5C,yCAAyC,EACzC;IACE,OAAO,EAAE;QACP,uBAAuB,EACrB,kIAAkI;KACrI;CACF,CACF,CAAC"}
