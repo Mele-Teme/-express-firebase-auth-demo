@@ -33,7 +33,6 @@ export const refreshController = async (req, res) => {
     try {
         console.log(req.body.uid);
         const uid = req.body.uid;
-        console.log(process.env.HASURA_GRAPHQL_URL);
         const response = await graphQLClient.request(gql `
         query ($uid: String!) {
           user: users_by_pk(id: $uid) {
@@ -57,6 +56,7 @@ export const refreshController = async (req, res) => {
         }
     }
     catch (error) {
+        console.log(error);
         res.status(500).send("INTERNAL ERROR");
     }
 };

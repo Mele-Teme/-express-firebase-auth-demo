@@ -46,7 +46,6 @@ export const refreshController = async (req: Request, res: Response) => {
     console.log(req.body.uid);
 
     const uid = req.body.uid;
-    console.log(process.env.HASURA_GRAPHQL_URL);
 
     const response = await graphQLClient.request(
       gql`
@@ -71,6 +70,8 @@ export const refreshController = async (req: Request, res: Response) => {
       res.status(440).send("SESSION EXPIRED");
     }
   } catch (error) {
+    console.log(error);
+
     res.status(500).send("INTERNAL ERROR");
   }
 };
