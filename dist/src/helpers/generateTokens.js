@@ -11,9 +11,27 @@ export const generateRefreshTokens = (claims) => {
     });
     return refreshToken;
 };
-export const verifyRefreshToken = async (refreshToken) => {
+// [1] null {
+// [1]   name: 'Getaye1 Temesgen1',
+// [1]   metadata: {
+// [1]     roles: [ 'customer', 'admin', 'supplier' ],
+// [1]     user_id: 'wKhRtltQ75PvwyUsroGMTjBmwTD2'
+// [1]   },
+// [1]   iat: 1679250700,
+// [1]   exp: 1679855500
+// [1] }
+export const generateNewAccessToken = async (refreshToken) => {
+    let accessToken = null;
     jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (error, decoded) => {
-        console.log(error, decoded);
+        if (decoded) {
+            const typedDecoded = decoded;
+            const claims = {
+                name: typedDecoded.name,
+                metadata: typedDecoded.metadata,
+            };
+            accessToken = generateAccessTokens(claims);
+        }
     });
+    return accessToken;
 };
 //# sourceMappingURL=generateTokens.js.map

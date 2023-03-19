@@ -1,6 +1,6 @@
 import admin from "../config/firebase-config.js";
 import { getHasuraClaims } from "../helpers/getHasuraClaims.js";
-import { generateAccessTokens, generateRefreshTokens, verifyRefreshToken, } from "../helpers/generateTokens.js";
+import { generateAccessTokens, generateRefreshTokens, generateNewAccessToken, } from "../helpers/generateTokens.js";
 import { graphQLClient } from "../config/graphQLConfig.js";
 import { gql } from "graphql-request";
 export const loginController = async (req, res) => {
@@ -46,15 +46,17 @@ export const refreshController = async (req, res) => {
         const { user } = response;
         const refreshToken = user.refresh_token;
         if (refreshToken) {
-            verifyRefreshToken(refreshToken);
-            res.json({ response });
+            const accessToken = await generateNewAccessToken(refreshToken);
+            if (accessToken)
+                res.json({ accessToken });
+            else
+                res.status(440).send("SESSION EXPIRED");
         }
         else {
             res.status(440).send("SESSION EXPIRED");
         }
     }
     catch (error) {
-        console.log(error);
         res.status(500).send("INTERNAL ERROR");
     }
 };

@@ -4,7 +4,7 @@ import { getHasuraClaims } from "../helpers/getHasuraClaims.js";
 import {
   generateAccessTokens,
   generateRefreshTokens,
-  verifyRefreshToken,
+  generateNewAccessToken,
 } from "../helpers/generateTokens.js";
 import { graphQLClient } from "../config/graphQLConfig.js";
 import { gql } from "graphql-request";
@@ -64,14 +64,13 @@ export const refreshController = async (req: Request, res: Response) => {
     const { user } = response as { user: { refresh_token: string } };
     const refreshToken = user.refresh_token;
     if (refreshToken) {
-      verifyRefreshToken(refreshToken);
-      res.json({ response });
+      const accessToken = await generateNewAccessToken(refreshToken);
+      if (accessToken) res.json({ accessToken });
+      else res.status(440).send("SESSION EXPIRED");
     } else {
       res.status(440).send("SESSION EXPIRED");
     }
   } catch (error) {
-    console.log(error);
-
     res.status(500).send("INTERNAL ERROR");
   }
 };
