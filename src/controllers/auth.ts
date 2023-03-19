@@ -76,23 +76,26 @@ export const refreshController = async (req: Request, res: Response) => {
 };
 
 export const logoutController = async (req: Request, res: Response) => {
-  const sessionCookie = req.cookies.__session || "";
-  res.clearCookie("__session", {
-    httpOnly: true,
-    secure: true,
-    sameSite: "none",
-    path: "/",
-  });
+  const { uid } = req.body.input;
+
   try {
-    if (sessionCookie) {
-      // cancelling or invalidating user refresh token
-      const decodedClaims = await admin
-        .auth()
-        .verifySessionCookie(sessionCookie);
-      await admin.auth().revokeRefreshTokens(decodedClaims.sub);
-    }
-    res.status(200).json({ success: true });
+    const response = await graphQLClient.request(
+      gql`
+        mutation ($uid: String!) {
+          update_users_by_pk(
+            pk_columns: { id: $uid }
+            _set: { refresh_token: null }
+          ) {
+            refresh_token
+          }
+        }
+      `,
+      {
+        uid,
+      }
+    );
+    res.json({ success: true });
   } catch (error) {
-    res.status(404).send("Revoke Refresh Token Error");
+    res.status(500).send("INTERNAL ERROR");
   }
 };
