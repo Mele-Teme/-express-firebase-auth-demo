@@ -4,7 +4,6 @@ import { generateTokens } from "../helpers/generateTokens.js";
 import { graphQLClient } from "../config/graphQLConfig.js";
 import { gql } from "graphql-request";
 export const loginController = async (req, res) => {
-    console.log("finally dershalew");
     try {
         const { uid, firstName, lastName } = req.user;
         const developerClaim = await getHasuraClaims(uid, firstName, lastName);
@@ -22,10 +21,10 @@ export const loginController = async (req, res) => {
             uid,
             refreshToken,
         });
-        // res.json({ accessToken });
-        res.send("ok");
+        res.json({ accessToken });
     }
     catch (error) {
+        console.log(error);
         res.status(500).send("INTERNAL ERROR");
     }
 };

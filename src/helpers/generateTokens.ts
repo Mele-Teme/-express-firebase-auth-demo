@@ -7,7 +7,7 @@ export const generateTokens = (claims: {
     expiresIn: "15m",
   });
   const refreshToken = jwt.sign(
-    claims.metadata.user_id,
+    { uid: claims.metadata.user_id },
     process.env.REFRESH_TOKEN_SECRET,
     {
       expiresIn: "7d",

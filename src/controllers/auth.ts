@@ -6,8 +6,6 @@ import { graphQLClient } from "../config/graphQLConfig.js";
 import { gql } from "graphql-request";
 
 export const loginController = async (req: Request, res: Response) => {
-  console.log("finally dershalew");
-
   try {
     const { uid, firstName, lastName } = req.user;
 
@@ -30,9 +28,10 @@ export const loginController = async (req: Request, res: Response) => {
         refreshToken,
       }
     );
-    // res.json({ accessToken });
-    res.send("ok");
+    res.json({ accessToken });
   } catch (error) {
+    console.log(error);
+
     res.status(500).send("INTERNAL ERROR");
   }
 };
