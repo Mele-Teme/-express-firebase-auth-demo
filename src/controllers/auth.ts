@@ -28,7 +28,7 @@ export const loginController = async (req: Request, res: Response) => {
         refreshToken,
       }
     );
-    res.json({ accessToken });
+    res.json({ accessToken, uid });
   } catch (error) {
     console.log(error);
 
