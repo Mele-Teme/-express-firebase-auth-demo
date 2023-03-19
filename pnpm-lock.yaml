@@ -14,6 +14,7 @@ specifiers:
   graphql: ^16.6.0
   graphql-request: ^5.2.0
   graphql-tag: ^2.12.6
+  jsonwebtoken: ^9.0.0
   nodemon: ^2.0.21
   ts-node: ^10.9.1
   ts-node-dev: ^2.0.0
@@ -30,6 +31,7 @@ dependencies:
   graphql: 16.6.0
   graphql-request: 5.2.0_graphql@16.6.0
   graphql-tag: 2.12.6_graphql@16.6.0
+  jsonwebtoken: 9.0.0
   ts-node: 10.9.1_alpjt73dvgv6kni625hu7f2l4m
   ts-node-dev: 2.0.0_alpjt73dvgv6kni625hu7f2l4m
 

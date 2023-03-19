@@ -1,17 +1,37 @@
 import { Request, Response } from "express";
 import admin from "../config/firebase-config.js";
 import { getHasuraClaims } from "../helpers/getHasuraClaims.js";
+import { generateTokens } from "../helpers/generateTokens.js";
+import { graphQLClient } from "../config/graphQLConfig.js";
+import { gql } from "graphql-request";
 
 export const loginController = async (req: Request, res: Response) => {
   try {
-    const uid = req.user.uid;
-    const developerClaim = await getHasuraClaims(uid);
+    const { uid, firstName, lastName } = req.user;
 
-    const customToken = await admin
-      .auth()
-      .createCustomToken(uid, developerClaim)
+    const developerClaim = await getHasuraClaims(uid, firstName, lastName);
+    const { accessToken, refreshToken } = generateTokens(developerClaim);
 
-    res.json({ customToken });
+    graphQLClient
+      .request(
+        gql`
+          mutation ($uid: String!, $refreshToken: String) {
+            update_users_by_pk(
+              pk_columns: { id: $uid }
+              _set: { refresh_token: $refreshToken }
+            ) {
+              refresh_token
+            }
+          }
+        `,
+        {
+          uid,
+          refreshToken,
+        }
+      )
+      .then((result) => {
+        res.json({ accessToken });
+      });
   } catch (error) {
     res.status(500).send("INTERNAL ERROR");
   }
@@ -50,7 +70,7 @@ export const logoutController = async (req: Request, res: Response) => {
     httpOnly: true,
     secure: true,
     sameSite: "none",
-    path: "/",  
+    path: "/",
   });
   try {
     if (sessionCookie) {
