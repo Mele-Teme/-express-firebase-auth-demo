@@ -36,33 +36,6 @@ export const loginController = async (req: Request, res: Response) => {
   }
 };
 
-export const setSessionCookieController = async (
-  req: Request,
-  res: Response
-) => {
-  const idToken = req.body.input.token;
-
-  const expiresIn = 60 * 60 * 24 * 7 * 1000; //5 days
-
-  try {
-    const sessionCookie = await admin
-      .auth()
-      .createSessionCookie(idToken, { expiresIn });
-
-    res.cookie("__session", sessionCookie, {
-      maxAge: expiresIn,
-      httpOnly: true,
-      secure: true,
-      sameSite: "none",
-      path: "/",
-    });
-
-    res.status(200).json({ uid: req.user.uid });
-  } catch (error) {
-    res.status(401).send("UNAUTHORIZED REQUEST!");
-  }
-};
-
 export const logoutController = async (req: Request, res: Response) => {
   const sessionCookie = req.cookies.__session || "";
   res.clearCookie("__session", {

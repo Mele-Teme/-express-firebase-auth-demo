@@ -1,9 +1,6 @@
 import { graphQLClient } from "../config/graphQLConfig.js";
 import { gql } from "graphql-request";
 
-
-
-
 export const getHasuraClaims = async (
   uid: string,
   firstName: string,
