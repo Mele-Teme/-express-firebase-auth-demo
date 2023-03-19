@@ -12,26 +12,23 @@ export const loginController = async (req: Request, res: Response) => {
     const developerClaim = await getHasuraClaims(uid, firstName, lastName);
     const { accessToken, refreshToken } = generateTokens(developerClaim);
 
-    graphQLClient
-      .request(
-        gql`
-          mutation ($uid: String!, $refreshToken: String) {
-            update_users_by_pk(
-              pk_columns: { id: $uid }
-              _set: { refresh_token: $refreshToken }
-            ) {
-              refresh_token
-            }
+    await graphQLClient.request(
+      gql`
+        mutation ($uid: String!, $refreshToken: String) {
+          update_users_by_pk(
+            pk_columns: { id: $uid }
+            _set: { refresh_token: $refreshToken }
+          ) {
+            refresh_token
           }
-        `,
-        {
-          uid,
-          refreshToken,
         }
-      )
-      .then((result) => {
-        res.json({ accessToken });
-      });
+      `,
+      {
+        uid,
+        refreshToken,
+      }
+    );
+    res.json({ accessToken });
   } catch (error) {
     res.status(500).send("INTERNAL ERROR");
   }
