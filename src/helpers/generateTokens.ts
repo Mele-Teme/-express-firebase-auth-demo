@@ -4,7 +4,7 @@ export const generateAccessTokens = (claims: {
   metadata: { roles: Array<string>; user_id: string };
 }) => {
   const accessToken = jwt.sign(claims, process.env.ACCESS_TOKEN_SECRET, {
-    expiresIn: "2m",
+    expiresIn: "15m",
   });
   return accessToken;
 };
