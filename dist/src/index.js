@@ -17,7 +17,7 @@ app.set("view engine", "ejs");
 app.use("/auth", authRouter);
 app.use("/api/peoples", apiRouter);
 app.get("/", (req, res) => {
-    res.send("works");
+    res.send("works12345");
 });
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

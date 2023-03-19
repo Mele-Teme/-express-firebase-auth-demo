@@ -1,12 +1,4 @@
 import jwt from "jsonwebtoken";
-
-// {
-//     name: `${firstName} ${lastName}`,
-//     metadata: {
-//       roles,
-//       user_id: uid,
-//     },
-//   }
 export const generateTokens = (claims: {
   name: string;
   metadata: { roles: Array<string>; user_id: string };

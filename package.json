@@ -2,13 +2,12 @@
   "name": "hibirlink backend",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "dist/src/index.js",
   "type": "module",
   "scripts": {
-    "start:dev": "ts-node-dev ./src/index.ts",
-    "start": "tsc && node ./public/index.js",
+    "start": "tsc && node ./dist/src/index.js",
     "build": "npx tsc ",
-    "dev": "concurrently \"npx tsc --watch\" \"nodemon -q public/index.js\""
+    "dev": "concurrently \"npx tsc --watch\" \"nodemon -q dist/src/index.js\""
   },
   "keywords": [],
   "author": "",

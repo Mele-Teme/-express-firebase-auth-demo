@@ -1,17 +1,12 @@
-import express, { Request, Response, Express } from "express";
-import {
-  loginController,
-  logoutController,
-  // setSessionCookieController,
-} from "../controllers/auth.js";
-import {
-  verifyIDToken,
-  // verifyIDTokenForSessionCreation,
-} from "../middleware/verifyIDToken.js";
+import express from "express";
+import { loginController, logoutController,
+// setSessionCookieController,
+ } from "../controllers/auth.js";
+import { verifyIDToken,
+// verifyIDTokenForSessionCreation,
+ } from "../middleware/verifyIDToken.js";
 import { registerUser } from "../middleware/registerUser.js";
-
 export const authRouter = express.Router();
-
 authRouter.post("/login", verifyIDToken, registerUser, loginController);
 // authRouter.post(
 //   "/setSessionCookie",
@@ -19,3 +14,4 @@ authRouter.post("/login", verifyIDToken, registerUser, loginController);
 //   setSessionCookieController
 // );
 authRouter.post("/logout", logoutController);
+//# sourceMappingURL=auth.js.map

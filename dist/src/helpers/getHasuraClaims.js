@@ -1,6 +1,6 @@
 import { graphQLClient } from "../config/graphQLConfig.js";
 import { gql } from "graphql-request";
-export const getHasuraClaims = async (uid) => {
+export const getHasuraClaims = async (uid, firstName, lastName) => {
     const claims = await graphQLClient
         .request(gql `
         query ($uid: String!) {
@@ -20,6 +20,7 @@ export const getHasuraClaims = async (uid) => {
         roleWithoutDefault.splice(0, 0, { name: typedResult.default_role.role });
         const roles = roleWithoutDefault.map((role) => role.name);
         return {
+            name: `${firstName} ${lastName}`,
             metadata: {
                 roles,
                 user_id: uid,
@@ -27,8 +28,13 @@ export const getHasuraClaims = async (uid) => {
         };
     })
         .catch((error) => {
-        console.log("Fetch Role Error: --->", error);
-        return null;
+        return {
+            name: `${firstName} ${lastName}`,
+            metadata: {
+                roles: ["anonymous"],
+                user_id: uid,
+            },
+        };
     });
     return claims;
 };
