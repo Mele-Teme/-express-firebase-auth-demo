@@ -6,57 +6,12 @@ import {
   generateRefreshTokens,
   generateNewAccessToken,
 } from "../helpers/generateTokens.js";
-import { graphQLClient } from "../config/graphQLConfig.js";
-import { gql } from "graphql-request";
-
-const setRefreshTokenToNull = async (uid: string) => {
-  try {
-    const response = await graphQLClient.request(
-      gql`
-        mutation ($uid: String!) {
-          update_users_by_pk(
-            pk_columns: { id: $uid }
-            _set: { refresh_token: null }
-          ) {
-            refresh_token
-          }
-        }
-      `,
-      {
-        uid,
-      }
-    );
-    return { success: true, error: null };
-  } catch (error) {
-    return { success: false, error };
-  }
-};
-const updateUserRefreshToken = async (uid: string, refreshToken: string) => {
-  try {
-    await graphQLClient.request(
-      gql`
-        mutation ($uid: String!, $refreshToken: String) {
-          update_users_by_pk(
-            pk_columns: { id: $uid }
-            _set: { refresh_token: $refreshToken }
-          ) {
-            refresh_token
-          }
-        }
-      `,
-      {
-        uid,
-        refreshToken,
-      }
-    );
-    return { success: true, error: null };
-  } catch (error) {
-    return { success: false, error };
-  }
-};
+import { useMutations } from "../graphql/mutation/useMutation.js";
+import { useQuery } from "../graphql/query/useQuery.js";
 
 export const loginController = async (req: Request, res: Response) => {
   try {
+    const { updateUserRefreshToken } = useMutations();
     const { uid, firstName, lastName } = req.user;
 
     const developerClaim = await getHasuraClaims(uid, firstName, lastName);
@@ -77,20 +32,10 @@ export const loginController = async (req: Request, res: Response) => {
 
 export const refreshController = async (req: Request, res: Response) => {
   try {
+    const { setRefreshTokenToNull, updateUserRefreshToken } = useMutations();
+    const { fetchUserByPk } = useQuery();
     const uid = req.body.uid;
-    const response = await graphQLClient.request(
-      gql`
-        query ($uid: String!) {
-          user: users_by_pk(id: $uid) {
-            refresh_token
-          }
-        }
-      `,
-      {
-        uid,
-      }
-    );
-
+    const response = await fetchUserByPk(uid);
     const { user } = response as { user: { refresh_token: string } };
     const refreshToken = user.refresh_token;
     if (refreshToken) {
@@ -117,7 +62,7 @@ export const refreshController = async (req: Request, res: Response) => {
 
 export const logoutController = async (req: Request, res: Response) => {
   const { uid } = req.body.input;
-
+  const { setRefreshTokenToNull } = useMutations();
   const response = await setRefreshTokenToNull(uid);
   if (response.success) {
     res.json({ success: true });

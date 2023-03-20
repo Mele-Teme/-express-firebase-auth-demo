@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { graphQLClient } from "../config/graphQLConfig.js";
-import { gql } from "graphql-request";
+import { useMutations } from "../graphql/mutation/useMutation.js";
 
 export const registerUser = async (
   req: Request,
@@ -10,26 +9,8 @@ export const registerUser = async (
   const { uid: id, firstName, lastName, email } = req.user;
 
   try {
-    graphQLClient
-      .request(
-        gql`
-          mutation insertUser($object: users_insert_input!) {
-            insert_users_one(object: $object) {
-              id
-            }
-          }
-        `,
-        {
-          object: {
-            id,
-            firstName,
-            lastName,
-            email,
-          },
-        }
-      )
-      .then((value) => {})
-      .catch((error) => {});
+    const { insertUser } = useMutations();
+    await insertUser(id, firstName, lastName, email);
   } finally {
     return next();
   }

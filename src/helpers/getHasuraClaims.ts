@@ -1,27 +1,12 @@
-import { graphQLClient } from "../config/graphQLConfig.js";
-import { gql } from "graphql-request";
+import { useQuery } from "../graphql/query/useQuery.js";
 
 export const getHasuraClaims = async (
   uid: string,
   firstName: string,
   lastName: string
 ) => {
-  const claims = await graphQLClient
-    .request(
-      gql`
-        query ($uid: String!) {
-          default_role: users_by_pk(id: $uid) {
-            role
-          }
-          allowed_roles: role {
-            name
-          }
-        }
-      `,
-      {
-        uid,
-      }
-    )
+  const { fetchUserRole } = useQuery();
+  const claims = await fetchUserRole(uid)
     .then((result) => {
       const typedResult = result as {
         default_role: { role: string };
