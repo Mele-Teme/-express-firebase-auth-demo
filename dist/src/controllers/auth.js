@@ -1,4 +1,3 @@
-import admin from "../config/firebase-config.js";
 import { getHasuraClaims } from "../helpers/getHasuraClaims.js";
 import { generateAccessTokens, generateRefreshTokens, generateNewAccessToken, } from "../helpers/generateTokens.js";
 import { graphQLClient } from "../config/graphQLConfig.js";
@@ -31,7 +30,6 @@ export const loginController = async (req, res) => {
 };
 export const refreshController = async (req, res) => {
     try {
-        console.log(req.body.uid);
         const uid = req.body.uid;
         const response = await graphQLClient.request(gql `
         query ($uid: String!) {
@@ -61,25 +59,24 @@ export const refreshController = async (req, res) => {
     }
 };
 export const logoutController = async (req, res) => {
-    const sessionCookie = req.cookies.__session || "";
-    res.clearCookie("__session", {
-        httpOnly: true,
-        secure: true,
-        sameSite: "none",
-        path: "/",
-    });
+    const { uid } = req.body.input;
     try {
-        if (sessionCookie) {
-            // cancelling or invalidating user refresh token
-            const decodedClaims = await admin
-                .auth()
-                .verifySessionCookie(sessionCookie);
-            await admin.auth().revokeRefreshTokens(decodedClaims.sub);
+        const response = await graphQLClient.request(gql `
+        mutation ($uid: String!) {
+          update_users_by_pk(
+            pk_columns: { id: $uid }
+            _set: { refresh_token: null }
+          ) {
+            refresh_token
+          }
         }
-        res.status(200).json({ success: true });
+      `, {
+            uid,
+        });
+        res.json({ success: true });
     }
     catch (error) {
-        res.status(404).send("Revoke Refresh Token Error");
+        res.status(500).send("INTERNAL ERROR");
     }
 };
 //# sourceMappingURL=auth.js.map

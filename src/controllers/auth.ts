@@ -43,8 +43,6 @@ export const loginController = async (req: Request, res: Response) => {
 
 export const refreshController = async (req: Request, res: Response) => {
   try {
-    console.log(req.body.input.uid);
-
     const uid = req.body.uid;
 
     const response = await graphQLClient.request(
