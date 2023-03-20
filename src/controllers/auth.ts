@@ -44,7 +44,6 @@ export const loginController = async (req: Request, res: Response) => {
 export const refreshController = async (req: Request, res: Response) => {
   try {
     const uid = req.body.uid;
-
     const response = await graphQLClient.request(
       gql`
         query ($uid: String!) {
@@ -63,8 +62,12 @@ export const refreshController = async (req: Request, res: Response) => {
     if (refreshToken) {
       const accessToken = await generateNewAccessToken(refreshToken);
       if (accessToken) res.json({ accessToken });
-      else res.status(440).send("SESSION EXPIRED");
+      else {
+        await setRefreshTokenToNull(uid);
+        res.status(440).send("SESSION EXPIRED");
+      }
     } else {
+      await setRefreshTokenToNull(uid);
       res.status(440).send("SESSION EXPIRED");
     }
   } catch (error) {
@@ -73,9 +76,7 @@ export const refreshController = async (req: Request, res: Response) => {
   }
 };
 
-export const logoutController = async (req: Request, res: Response) => {
-  const { uid } = req.body.input;
-
+const setRefreshTokenToNull = async (uid: string) => {
   try {
     const response = await graphQLClient.request(
       gql`
@@ -92,8 +93,20 @@ export const logoutController = async (req: Request, res: Response) => {
         uid,
       }
     );
-    res.json({ success: true });
+    return { success: true, error: null };
   } catch (error) {
+    return { success: false, error };
+  }
+};
+
+export const logoutController = async (req: Request, res: Response) => {
+  const { uid } = req.body.input;
+
+  const response = await setRefreshTokenToNull(uid);
+  if (response.success) {
+    res.json({ success: true });
+  } else {
+    console.log(response.error);
     res.status(500).send("INTERNAL ERROR");
   }
 };
