@@ -21,6 +21,7 @@ export const generateRefreshTokens = (claims: {
 export const generateNewAccessToken = async (refreshToken: string) => {
   let accessToken = null;
   let newRefreshToken = null;
+  
   jwt.verify(
     refreshToken,
     process.env.REFRESH_TOKEN_SECRET,
