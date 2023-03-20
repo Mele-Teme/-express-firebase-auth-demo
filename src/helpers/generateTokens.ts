@@ -4,7 +4,7 @@ export const generateAccessTokens = (claims: {
   metadata: { roles: Array<string>; user_id: string };
 }) => {
   const accessToken = jwt.sign(claims, process.env.ACCESS_TOKEN_SECRET, {
-    expiresIn: "15m",
+    expiresIn: "30s",
   });
   return accessToken;
 };
@@ -13,20 +13,10 @@ export const generateRefreshTokens = (claims: {
   metadata: { roles: Array<string>; user_id: string };
 }) => {
   const refreshToken = jwt.sign(claims, process.env.REFRESH_TOKEN_SECRET, {
-    expiresIn: "7d",
+    expiresIn: "3m",
   });
   return refreshToken;
 };
-
-// [1] null {
-// [1]   name: 'Getaye1 Temesgen1',
-// [1]   metadata: {
-// [1]     roles: [ 'customer', 'admin', 'supplier' ],
-// [1]     user_id: 'wKhRtltQ75PvwyUsroGMTjBmwTD2'
-// [1]   },
-// [1]   iat: 1679250700,
-// [1]   exp: 1679855500
-// [1] }
 
 export const generateNewAccessToken = async (refreshToken: string) => {
   let accessToken = null;
