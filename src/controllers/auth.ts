@@ -9,14 +9,30 @@ import {
 import { graphQLClient } from "../config/graphQLConfig.js";
 import { gql } from "graphql-request";
 
-export const loginController = async (req: Request, res: Response) => {
+const setRefreshTokenToNull = async (uid: string) => {
   try {
-    const { uid, firstName, lastName } = req.user;
-
-    const developerClaim = await getHasuraClaims(uid, firstName, lastName);
-    const accessToken = generateAccessTokens(developerClaim);
-    const refreshToken = generateRefreshTokens(developerClaim);
-
+    const response = await graphQLClient.request(
+      gql`
+        mutation ($uid: String!) {
+          update_users_by_pk(
+            pk_columns: { id: $uid }
+            _set: { refresh_token: null }
+          ) {
+            refresh_token
+          }
+        }
+      `,
+      {
+        uid,
+      }
+    );
+    return { success: true, error: null };
+  } catch (error) {
+    return { success: false, error };
+  }
+};
+const updateUserRefreshToken = async (uid: string, refreshToken: string) => {
+  try {
     await graphQLClient.request(
       gql`
         mutation ($uid: String!, $refreshToken: String) {
@@ -33,10 +49,28 @@ export const loginController = async (req: Request, res: Response) => {
         refreshToken,
       }
     );
-    res.json({ accessToken, uid });
+    return { success: true, error: null };
+  } catch (error) {
+    return { success: false, error };
+  }
+};
+
+export const loginController = async (req: Request, res: Response) => {
+  try {
+    const { uid, firstName, lastName } = req.user;
+
+    const developerClaim = await getHasuraClaims(uid, firstName, lastName);
+    const accessToken = generateAccessTokens(developerClaim);
+    const refreshToken = generateRefreshTokens(developerClaim);
+
+    const { error, success } = await updateUserRefreshToken(uid, refreshToken);
+    if (success) res.json({ accessToken, uid });
+    if (error) {
+      console.log(error);
+      res.status(500).send("INTERNAL ERROR");
+    }
   } catch (error) {
     console.log(error);
-
     res.status(500).send("INTERNAL ERROR");
   }
 };
@@ -60,7 +94,12 @@ export const refreshController = async (req: Request, res: Response) => {
     const { user } = response as { user: { refresh_token: string } };
     const refreshToken = user.refresh_token;
     if (refreshToken) {
-      const accessToken = await generateNewAccessToken(refreshToken);
+      const { accessToken, newRefreshToken } = await generateNewAccessToken(
+        refreshToken
+      );
+      if (newRefreshToken) {
+        await updateUserRefreshToken(uid, newRefreshToken);
+      }
       if (accessToken) res.json({ accessToken });
       else {
         await setRefreshTokenToNull(uid);
@@ -73,29 +112,6 @@ export const refreshController = async (req: Request, res: Response) => {
   } catch (error) {
     console.log(error);
     res.status(500).send("INTERNAL ERROR");
-  }
-};
-
-const setRefreshTokenToNull = async (uid: string) => {
-  try {
-    const response = await graphQLClient.request(
-      gql`
-        mutation ($uid: String!) {
-          update_users_by_pk(
-            pk_columns: { id: $uid }
-            _set: { refresh_token: null }
-          ) {
-            refresh_token
-          }
-        }
-      `,
-      {
-        uid,
-      }
-    );
-    return { success: true, error: null };
-  } catch (error) {
-    return { success: false, error };
   }
 };
 

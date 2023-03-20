@@ -4,7 +4,7 @@ export const generateAccessTokens = (claims: {
   metadata: { roles: Array<string>; user_id: string };
 }) => {
   const accessToken = jwt.sign(claims, process.env.ACCESS_TOKEN_SECRET, {
-    expiresIn: "30s",
+    expiresIn: "15s",
   });
   return accessToken;
 };
@@ -13,32 +13,39 @@ export const generateRefreshTokens = (claims: {
   metadata: { roles: Array<string>; user_id: string };
 }) => {
   const refreshToken = jwt.sign(claims, process.env.REFRESH_TOKEN_SECRET, {
-    expiresIn: "3m",
+    expiresIn: "1m",
   });
   return refreshToken;
 };
 
 export const generateNewAccessToken = async (refreshToken: string) => {
   let accessToken = null;
+  let newRefreshToken = null;
   jwt.verify(
     refreshToken,
     process.env.REFRESH_TOKEN_SECRET,
     (error, decoded) => {
       if (decoded) {
-        const typedDecoded = decoded as {
+        const { name, metadata, exp } = decoded as {
           name: string;
           metadata: { roles: Array<string>; user_id: string };
           iat: number;
           exp: number;
         };
         const claims = {
-          name: typedDecoded.name,
-          metadata: typedDecoded.metadata,
+          name,
+          metadata,
         };
         accessToken = generateAccessTokens(claims);
+        const currentDate = Date.now();
+        const refTokenExpDate = exp * 1000;
+        // if dif is less than 1Day refresh the refreshToken
+        // if (refTokenExpDate - currentDate < 86400000)
+        if (refTokenExpDate - currentDate < 30000)
+          newRefreshToken = generateRefreshTokens(claims);
       }
     }
   );
 
-  return accessToken;
+  return { accessToken, newRefreshToken };
 };
