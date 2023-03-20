@@ -45,7 +45,7 @@ export const refreshController = async (req: Request, res: Response) => {
   try {
     console.log(req.body.input.uid);
 
-    const uid = req.body.input.uid;
+    const uid = req.body.uid;
 
     const response = await graphQLClient.request(
       gql`
