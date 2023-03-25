@@ -1,27 +1,21 @@
 import { getHasuraClaims } from "../helpers/getHasuraClaims.js";
 import { generateAccessTokens, generateRefreshTokens, generateNewAccessToken, } from "../helpers/generateTokens.js";
-import { graphQLClient } from "../config/graphQLConfig.js";
-import { gql } from "graphql-request";
+import { useMutations } from "../graphql/mutation/useMutation.js";
+import { useQuery } from "../graphql/query/useQuery.js";
 export const loginController = async (req, res) => {
     try {
+        const { updateUserRefreshToken } = useMutations();
         const { uid, firstName, lastName } = req.user;
         const developerClaim = await getHasuraClaims(uid, firstName, lastName);
         const accessToken = generateAccessTokens(developerClaim);
         const refreshToken = generateRefreshTokens(developerClaim);
-        await graphQLClient.request(gql `
-        mutation ($uid: String!, $refreshToken: String) {
-          update_users_by_pk(
-            pk_columns: { id: $uid }
-            _set: { refresh_token: $refreshToken }
-          ) {
-            refresh_token
-          }
+        const { error, success } = await updateUserRefreshToken(uid, refreshToken);
+        if (success)
+            res.json({ accessToken, uid });
+        if (error) {
+            console.log(error);
+            res.status(500).send("INTERNAL ERROR");
         }
-      `, {
-            uid,
-            refreshToken,
-        });
-        res.json({ accessToken, uid });
     }
     catch (error) {
         console.log(error);
@@ -30,26 +24,26 @@ export const loginController = async (req, res) => {
 };
 export const refreshController = async (req, res) => {
     try {
+        const { setRefreshTokenToNull, updateUserRefreshToken } = useMutations();
+        const { fetchUserByPk } = useQuery();
         const uid = req.body.uid;
-        const response = await graphQLClient.request(gql `
-        query ($uid: String!) {
-          user: users_by_pk(id: $uid) {
-            refresh_token
-          }
-        }
-      `, {
-            uid,
-        });
+        const response = await fetchUserByPk(uid);
         const { user } = response;
         const refreshToken = user.refresh_token;
         if (refreshToken) {
-            const accessToken = await generateNewAccessToken(refreshToken);
+            const { accessToken, newRefreshToken } = await generateNewAccessToken(refreshToken);
+            if (newRefreshToken) {
+                await updateUserRefreshToken(uid, newRefreshToken);
+            }
             if (accessToken)
                 res.json({ accessToken });
-            else
+            else {
+                await setRefreshTokenToNull(uid);
                 res.status(440).send("SESSION EXPIRED");
+            }
         }
         else {
+            await setRefreshTokenToNull(uid);
             res.status(440).send("SESSION EXPIRED");
         }
     }
@@ -60,22 +54,13 @@ export const refreshController = async (req, res) => {
 };
 export const logoutController = async (req, res) => {
     const { uid } = req.body.input;
-    try {
-        const response = await graphQLClient.request(gql `
-        mutation ($uid: String!) {
-          update_users_by_pk(
-            pk_columns: { id: $uid }
-            _set: { refresh_token: null }
-          ) {
-            refresh_token
-          }
-        }
-      `, {
-            uid,
-        });
+    const { setRefreshTokenToNull } = useMutations();
+    const response = await setRefreshTokenToNull(uid);
+    if (response.success) {
         res.json({ success: true });
     }
-    catch (error) {
+    else {
+        console.log(response.error);
         res.status(500).send("INTERNAL ERROR");
     }
 };
