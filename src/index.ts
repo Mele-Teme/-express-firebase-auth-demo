@@ -5,7 +5,7 @@ import { corsOptions } from "./config/corsOption.js";
 import { credentials } from "./middleware/credentials.js";
 import cookieParser from "cookie-parser";
 import { authRouter } from "./routes/auth.js";
-import { apiRouter } from "./routes/peoples.js";
+import { apiRouter } from "./routes/api.js";
 dotenv.config();
 
 const app: Express = express();
@@ -18,7 +18,7 @@ app.use(express.json());
 app.set("view engine", "ejs");
 
 app.use("/auth", authRouter);
-app.use("/api/peoples", apiRouter);
+app.use("/api", apiRouter);
 
 app.get("/", (req, res) => {
   res.send("works12345");
