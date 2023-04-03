@@ -12,9 +12,14 @@ import { useQuery } from "../graphql/query/useQuery.js";
 export const loginController = async (req: Request, res: Response) => {
   try {
     const { updateUserRefreshToken } = useMutations();
-    const { uid, firstName, lastName } = req.user;
+    const { uid, firstName, lastName, email } = req.user;
 
-    const developerClaim = await getHasuraClaims(uid, firstName, lastName);
+    const developerClaim = await getHasuraClaims(
+      uid,
+      firstName,
+      lastName,
+      email
+    );
     const accessToken = generateAccessTokens(developerClaim);
     const refreshToken = generateRefreshTokens(developerClaim);
 

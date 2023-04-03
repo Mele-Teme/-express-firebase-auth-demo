@@ -3,7 +3,8 @@ import { useQuery } from "../graphql/query/useQuery.js";
 export const getHasuraClaims = async (
   uid: string,
   firstName: string,
-  lastName: string
+  lastName: string,
+  email: string
 ) => {
   const { fetchUserRole } = useQuery();
   const claims = await fetchUserRole(uid)
@@ -22,6 +23,7 @@ export const getHasuraClaims = async (
 
       return {
         name: `${firstName} ${lastName}`,
+        email,
         metadata: {
           roles,
           user_id: uid,
