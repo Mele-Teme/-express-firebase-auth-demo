@@ -25,8 +25,7 @@ export const useMutations = () => {
           },
         }
       )
-      .catch((e) => {
-      });
+      .catch((e) => {});
   };
 
   const setRefreshTokenToNull = async (uid: string) => {
@@ -76,9 +75,45 @@ export const useMutations = () => {
     }
   };
 
+  const registerAsSupplier = async (
+    uid: string,
+    object: {
+      id: string;
+      tin_number: string;
+      subcity_id: number;
+      social_media: string;
+    }
+  ) => {
+    try {
+      await graphQLClient.request(
+        gql`
+          mutation ($uid: String!, $object: supplier_insert_input!) {
+            insert_supplier_one(object: $object) {
+              id
+            }
+            update_users_by_pk(
+              pk_columns: { id: $uid }
+              _set: { role: supplier }
+            ) {
+              id
+            }
+          }
+        `,
+        {
+          uid,
+          object,
+        }
+      );
+      return { success: true, error: null };
+    } catch (error) {
+      return { success: false, error };
+    }
+  };
+
   return {
     insertUser,
     setRefreshTokenToNull,
     updateUserRefreshToken,
+    registerAsSupplier,
   };
 };
