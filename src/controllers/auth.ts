@@ -40,6 +40,9 @@ export const refreshController = async (req: Request, res: Response) => {
     const response = await fetchUserByPk(uid);
     const { user } = response as { user: { refresh_token: string } };
     const refreshToken = user.refresh_token;
+
+    console.log({ refreshToken });
+
     if (refreshToken) {
       const { accessToken, newRefreshToken } = await generateNewAccessToken(
         refreshToken
