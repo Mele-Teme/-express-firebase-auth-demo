@@ -8,8 +8,8 @@ export const useQuery = () => {
           default_role: users_by_pk(id: $uid) {
             role
           }
-          allowed_roles: role {
-            name
+          allowed_roles: roles {
+            role
           }
         }
       `,
