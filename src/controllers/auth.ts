@@ -1,5 +1,4 @@
 import { Request, Response } from "express";
-import admin from "../config/firebase-config.js";
 import { getHasuraClaims } from "../helpers/getHasuraClaims.js";
 import {
   generateAccessTokens,
@@ -13,6 +12,8 @@ export const loginController = async (req: Request, res: Response) => {
   try {
     const { updateUserRefreshToken } = useMutations();
     const { uid, firstName, lastName, email } = req.user;
+
+    console.log({ uid, email, firstName });
 
     const developerClaim = await getHasuraClaims(
       uid,

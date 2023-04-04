@@ -7,23 +7,27 @@ export const useMutations = () => {
     lastName: string,
     email: string
   ) => {
-    await graphQLClient.request(
-      gql`
-        mutation insertUser($object: users_insert_input!) {
-          insert_users_one(object: $object) {
-            id
+    await graphQLClient
+      .request(
+        gql`
+          mutation insertUser($object: users_insert_input!) {
+            insert_users_one(object: $object) {
+              id
+            }
           }
+        `,
+        {
+          object: {
+            id,
+            first_name: firstName,
+            last_name: lastName,
+            email,
+          },
         }
-      `,
-      {
-        object: {
-          id,
-          firstName,
-          lastName,
-          email,
-        },
-      }
-    );
+      )
+      .catch((e) => {
+        console.log({ e });
+      });
   };
 
   const setRefreshTokenToNull = async (uid: string) => {

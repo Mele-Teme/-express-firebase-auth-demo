@@ -2,19 +2,23 @@ import { graphQLClient } from "../../config/graphQLConfig.js";
 import { gql } from "graphql-request";
 export const useMutations = () => {
     const insertUser = async (id, firstName, lastName, email) => {
-        await graphQLClient.request(gql `
-        mutation insertUser($object: users_insert_input!) {
-          insert_users_one(object: $object) {
-            id
+        await graphQLClient
+            .request(gql `
+          mutation insertUser($object: users_insert_input!) {
+            insert_users_one(object: $object) {
+              id
+            }
           }
-        }
-      `, {
+        `, {
             object: {
                 id,
-                firstName,
-                lastName,
+                first_name: firstName,
+                last_name: lastName,
                 email,
             },
+        })
+            .catch((e) => {
+            console.log({ e });
         });
     };
     const setRefreshTokenToNull = async (uid) => {
