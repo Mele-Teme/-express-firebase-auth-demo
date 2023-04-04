@@ -6,7 +6,6 @@ export const loginController = async (req, res) => {
     try {
         const { updateUserRefreshToken } = useMutations();
         const { uid, firstName, lastName, email } = req.user;
-        console.log({ uid, email, firstName });
         const developerClaim = await getHasuraClaims(uid, firstName, lastName, email);
         const accessToken = generateAccessTokens(developerClaim);
         const refreshToken = generateRefreshTokens(developerClaim);
@@ -14,12 +13,10 @@ export const loginController = async (req, res) => {
         if (success)
             res.json({ accessToken, uid });
         if (error) {
-            console.log(error);
             res.status(500).send("INTERNAL ERROR");
         }
     }
     catch (error) {
-        console.log(error);
         res.status(500).send("INTERNAL ERROR");
     }
 };
@@ -49,7 +46,6 @@ export const refreshController = async (req, res) => {
         }
     }
     catch (error) {
-        console.log(error);
         res.status(500).send("INTERNAL ERROR");
     }
 };
@@ -61,7 +57,6 @@ export const logoutController = async (req, res) => {
         res.json({ success: true });
     }
     else {
-        console.log(response.error);
         res.status(500).send("INTERNAL ERROR");
     }
 };

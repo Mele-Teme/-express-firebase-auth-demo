@@ -18,7 +18,6 @@ export const useMutations = () => {
             },
         })
             .catch((e) => {
-            console.log({ e });
         });
     };
     const setRefreshTokenToNull = async (uid) => {

@@ -13,8 +13,6 @@ export const loginController = async (req: Request, res: Response) => {
     const { updateUserRefreshToken } = useMutations();
     const { uid, firstName, lastName, email } = req.user;
 
-    console.log({ uid, email, firstName });
-
     const developerClaim = await getHasuraClaims(
       uid,
       firstName,
@@ -27,11 +25,9 @@ export const loginController = async (req: Request, res: Response) => {
     const { error, success } = await updateUserRefreshToken(uid, refreshToken);
     if (success) res.json({ accessToken, uid });
     if (error) {
-      console.log(error);
       res.status(500).send("INTERNAL ERROR");
     }
   } catch (error) {
-    console.log(error);
     res.status(500).send("INTERNAL ERROR");
   }
 };
@@ -61,7 +57,6 @@ export const refreshController = async (req: Request, res: Response) => {
       res.status(440).send("SESSION EXPIRED");
     }
   } catch (error) {
-    console.log(error);
     res.status(500).send("INTERNAL ERROR");
   }
 };
@@ -73,7 +68,6 @@ export const logoutController = async (req: Request, res: Response) => {
   if (response.success) {
     res.json({ success: true });
   } else {
-    console.log(response.error);
     res.status(500).send("INTERNAL ERROR");
   }
 };

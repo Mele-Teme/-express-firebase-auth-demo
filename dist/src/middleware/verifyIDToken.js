@@ -18,7 +18,6 @@ export const verifyIDToken = async (req, res, next) => {
             return res.sendStatus(403).send("Email Not Verified.");
     }
     catch (error) {
-        console.log(error);
         return res.status(401).send("UNAUTHORIZED REQUEST!");
     }
 };

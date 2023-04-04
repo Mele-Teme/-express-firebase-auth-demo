@@ -26,7 +26,6 @@ export const useMutations = () => {
         }
       )
       .catch((e) => {
-        console.log({ e });
       });
   };
 
