@@ -27,7 +27,7 @@ export const registerSupplierController = (req: Request, res: Response) => {
 
         const { success, error } = await registerAsSupplier(user_id, {
           id: user_id,
-          social_media: socialAccount,
+          social_media: JSON.parse(socialAccount),
           subcity_id: subCityId,
           tin_number: tinNumber,
         });
