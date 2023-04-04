@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 export const generateAccessTokens = (claims: {
   name: string;
+  email: string;
   metadata: { roles: Array<string>; user_id: string };
 }) => {
   const accessToken = jwt.sign(claims, process.env.ACCESS_TOKEN_SECRET, {
@@ -11,6 +12,7 @@ export const generateAccessTokens = (claims: {
 };
 export const generateRefreshTokens = (claims: {
   name: string;
+  email: string;
   metadata: { roles: Array<string>; user_id: string };
 }) => {
   const refreshToken = jwt.sign(claims, process.env.REFRESH_TOKEN_SECRET, {
@@ -29,14 +31,16 @@ export const generateNewAccessToken = async (refreshToken: string) => {
     process.env.REFRESH_TOKEN_SECRET,
     (error, decoded) => {
       if (decoded) {
-        const { name, metadata, exp } = decoded as {
+        const { name, metadata, email, exp } = decoded as {
           name: string;
+          email: string;
           metadata: { roles: Array<string>; user_id: string };
           iat: number;
           exp: number;
         };
         const claims = {
           name,
+          email,
           metadata,
         };
         accessToken = generateAccessTokens(claims);

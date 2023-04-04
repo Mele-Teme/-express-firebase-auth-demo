@@ -11,15 +11,15 @@ export const getHasuraClaims = async (
     .then((result) => {
       const typedResult = result as {
         default_role: { role: string };
-        allowed_roles: Array<{ name: string }>;
+        allowed_roles: Array<{ role: string }>;
       };
 
       const roleWithoutDefault = typedResult.allowed_roles.filter(
-        (roles) => roles.name !== typedResult.default_role.role
+        (r) => r.role !== typedResult.default_role.role
       );
-      roleWithoutDefault.splice(0, 0, { name: typedResult.default_role.role });
+      roleWithoutDefault.splice(0, 0, { role: typedResult.default_role.role });
 
-      const roles = roleWithoutDefault.map((role) => role.name);
+      const roles = roleWithoutDefault.map((r) => r.role);
 
       return {
         name: `${firstName} ${lastName}`,
@@ -33,6 +33,7 @@ export const getHasuraClaims = async (
     .catch((error) => {
       return {
         name: `${firstName} ${lastName}`,
+        email: email,
         metadata: {
           roles: ["anonymous"],
           user_id: uid,
