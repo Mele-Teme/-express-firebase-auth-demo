@@ -5,7 +5,7 @@ export const generateAccessTokens = (claims: {
   metadata: { roles: Array<string>; user_id: string };
 }) => {
   const accessToken = jwt.sign(claims, process.env.ACCESS_TOKEN_SECRET, {
-    expiresIn: "30m",
+    expiresIn: "30d",
     // expiresIn: "30s",
   });
   return accessToken;
@@ -16,7 +16,7 @@ export const generateRefreshTokens = (claims: {
   metadata: { roles: Array<string>; user_id: string };
 }) => {
   const refreshToken = jwt.sign(claims, process.env.REFRESH_TOKEN_SECRET, {
-    expiresIn: "10d",
+    expiresIn: "50d",
     // expiresIn: "1m",
   });
   return refreshToken;
