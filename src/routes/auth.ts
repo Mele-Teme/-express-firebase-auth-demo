@@ -13,5 +13,5 @@ authRouter.post("/refresh", refreshController);
 authRouter.post("/logout", logoutController);
 authRouter.get("/get",(req:Request,res:Response)=>{
   console.log(req);
-  return res.json({message:req});
+  return res.json({message:"here is fine"});
 });
