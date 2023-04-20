@@ -25,9 +25,11 @@ export const loginController = async (req: Request, res: Response) => {
     const { error, success } = await updateUserRefreshToken(uid, refreshToken);
     if (success) res.json({ accessToken, uid });
     if (error) {
+      console.log("update",error);
       res.status(500).send("INTERNAL ERROR");
     }
   } catch (error) {
+    console.log("catch",error)
     res.status(500).send("INTERNAL ERROR");
   }
 };
